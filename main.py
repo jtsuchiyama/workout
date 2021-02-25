@@ -27,6 +27,9 @@ def log_post():
     reps = request.form.get('reps')
     completion = request.form.get('completion')
 
+    if completion == None:
+        completion = "false"
+
     new_log = Set(name=name, typ=typ, weight=weight, reps=reps, completion=completion)
     db.session.add(new_log)
     db.session.commit()
