@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h3 class="title">
+  New Workout
+</h3>
+<div class="box">
+    <form method="POST" action="/newlog">
+        <div class="field">
+            <div class="control">
+                <input class="input is-large" name="name" placeholder="Exercise Name">
+            </div>
+        </div>
+
+        <div class="field">
+            <div class="control">
+                <input class="input is-large" name="typ" placeholder="Exercise Type">
+            </div>
+        </div>
+
+        <div class="field">
+            <div class="control">
+                <input class="input is-large" type="number" name="weight" placeholder="Weight">
+            </div>
+        </div>
+
+        <div class="field">
+            <div class="control">
+                <input class="input is-large" type="number" name="reps" placeholder="Reps">
+            </div>
+        </div>
+
+        <div class="field">
+            <div class="control">
+                <input class="input is-large"  name="completion" placeholder="True/False">
+            </div>
+        </div>
+
+        <button class="button is-block is-info is-large is-fullwidth">Log workout</button>
+    </form>
+</div>
+<h2>
+  <a href="{{ url_for('main.profile') }}" class="title">Back to profile</a>
+</h2>
+{% endblock %}

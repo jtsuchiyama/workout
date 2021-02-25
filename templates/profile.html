@@ -2,6 +2,9 @@
 
 {% block content %}
 <h1 class="title">
-  Welcome, Anthony!
+  Welcome, {{ name }}!
 </h1>
+<h2>
+  <a href="{{ url_for('main.log_workout') }}" class="title">Log workout</a>
+</h2>
 {% endblock %}
