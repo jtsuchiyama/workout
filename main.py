@@ -20,21 +20,27 @@ def log_workout():
 
 @main.route('/newlog', methods=['POST'])
 def log_post():
-    name = request.form.get('name')
-    typ = request.form.get('typ')
-    weight = request.form.get('weight')
-    reps = request.form.get('reps')
-    completion = request.form.get('completion')
-    if completion == "on":
-        completion = "true"
-    else:
-        completion = "false"
-        
+    names = request.form.getlist('name')
+    types = request.form.getlist('typ')
+    weights = request.form.getlist('weight')
+    reps = request.form.getlist('reps')
+
     db = Database()
+    
+    date = "3"
     db.add(
-        """INSERT INTO set (name, typ, weight, reps, completion) 
-        VALUES(%s, %s, %s, %s, %s)""", 
-        (name, typ, weight, reps, completion)
+        """INSERT INTO workout (date) 
+            VALUES(%s)""", 
+            (date)
     )
+    
+    workout_id = db.select("SELECT LASTVAL()")[0][0]
+
+    for x in range(len(names)):
+        db.add(
+            """INSERT INTO set (name, typ, weight, reps, user_id, workout_id) 
+            VALUES(%s, %s, %s, %s, %s, %s)""", 
+            (names[x], types[x], weights[x], reps[x], current_user.id, workout_id)
+        )
 
     return redirect(url_for('main.profile'))
