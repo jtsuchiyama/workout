@@ -1,7 +1,6 @@
 from flask import Blueprint, render_template, request, redirect, url_for
 from flask_login import login_required, current_user
-from . import db
-from .models import ExerciseModel, Set
+from .db import Database
 
 main = Blueprint('main', __name__)
 
@@ -26,35 +25,16 @@ def log_post():
     weight = request.form.get('weight')
     reps = request.form.get('reps')
     completion = request.form.get('completion')
-
-    if completion == None:
+    if completion == "on":
+        completion = "true"
+    else:
         completion = "false"
-
-    new_log = Set(name=name, typ=typ, weight=weight, reps=reps, completion=completion)
-    db.session.add(new_log)
-    db.session.commit()
+        
+    db = Database()
+    db.add(
+        """INSERT INTO set (name, typ, weight, reps, completion) 
+        VALUES(%s, %s, %s, %s, %s)""", 
+        (name, typ, weight, reps, completion)
+    )
 
     return redirect(url_for('main.profile'))
-
-
-@main.route('/exercise', methods=['POST', 'GET'])
-def handle_exercise():
-    if request.method == 'POST':
-        if request.is_json:
-            data = request.get_json()
-            new_exercise = ExerciseModel(name=data['name'], typ=data['typ'])
-            db.session.add(new_exercise)
-            db.session.commit()
-            return {"message": f"exercise {new_exercise.name} has been created successfully."}
-        else:
-            return {"error": "The request payload is not in JSON format"}
-
-    elif request.method == 'GET':
-        exercises = ExerciseModel.query.all()
-        results = [
-            {
-                "name": exercise.name,
-                "typ": exercise.typ,
-            } for exercise in exercises]
-
-        return {"count": len(results), "exercises": results}

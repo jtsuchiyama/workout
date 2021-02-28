@@ -1,8 +1,8 @@
 from flask import Blueprint, render_template, redirect, url_for, request, flash
 from flask_login import login_user, logout_user, login_required
 from werkzeug.security import generate_password_hash, check_password_hash
+from .db import Database
 from .models import User
-from . import db
 
 auth = Blueprint('auth', __name__)
 
@@ -16,7 +16,7 @@ def login_post():
     password = request.form.get('password')
     remember = True if request.form.get('remember') else False
 
-    user = User.query.filter_by(email=email).first()
+    user = User.get_user(email,"email")
 
     # check if the user actually exists
     # take the user-supplied password, hash it, and compare it to the hashed password in the database
@@ -38,18 +38,23 @@ def signup_post():
     name = request.form.get('name')
     password = request.form.get('password')
 
-    user = User.query.filter_by(email=email).first() # if this returns a user, then the email already exists in database
+    db = Database()
+    emails = db.select(
+        "SELECT email FROM public.user"
+    )
+    if emails != []: # reformat to a list if need to check emails
+        emails = emails[0] 
 
-    if user: # if a user is found, we want to redirect back to signup page so user can try again
+    if email in emails: # if a user with the same email is found, we want to redirect back to signup page so user can try again
         flash('Email address already exists')
         return redirect(url_for('auth.signup'))
 
-    # create a new user with the form data. Hash the password so the plaintext version isn't saved.
-    new_user = User(email=email, name=name, password=generate_password_hash(password, method='sha256'))
-
-    # add the new user to the database
-    db.session.add(new_user)
-    db.session.commit()
+    password=generate_password_hash(password, method='sha256')
+    db.add(
+        """INSERT INTO public.user (email, password, name) 
+        VALUES(%s, %s, %s)""", 
+        (email, password, name)
+    )
 
     return redirect(url_for('auth.login'))
 
@@ -58,3 +63,4 @@ def signup_post():
 def logout():
     logout_user()
     return redirect(url_for('main.index'))
+
