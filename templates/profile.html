@@ -4,7 +4,21 @@
 <h1 class="title">
   Welcome, {{ name }}!
 </h1>
+
 <h2>
-  <a href="{{ url_for('main.log_workout') }}" class="title">Log workout</a>
+  Recent workouts  
 </h2>
+
+<div class="box">
+  <ul>
+      {% for workout in workouts %}
+        <a href="http://www.jaketsuchiyama.me/">{{ workout[2] }}</a>
+      {% endfor %}
+  </ul>
+</div>
+
+
+<h3>
+  <a href="{{ url_for('main.log_workout') }}" class="title">Log workout</a>
+</h3>
 {% endblock %}

@@ -11,7 +11,12 @@ def index():
 @main.route('/profile')
 @login_required
 def profile():
-    return render_template('profile.html', name=current_user.name)
+    db = Database()
+
+    query = "SELECT * FROM workout WHERE user_id = " + str(current_user.id)
+    workouts = db.select(query)
+
+    return render_template('profile.html', workouts=workouts, name=current_user.name)
 
 @main.route('/newlog')
 @login_required
@@ -25,13 +30,22 @@ def log_post():
     weights = request.form.getlist('weight')
     reps = request.form.getlist('reps')
 
+    name = ""
+    for typ in types:
+        if typ not in name:
+            if name == "":
+                name = name + typ
+            else:
+                name = name + "/" + typ
+    name = name + " Workout"
+
+    timestamp = "hi"
+
     db = Database()
-    
-    date = "3"
     db.add(
-        """INSERT INTO workout (date) 
-            VALUES(%s)""", 
-            (date)
+        """INSERT INTO workout (user_id, name, timestamp) 
+            VALUES(%s, %s, %s)""", 
+            (current_user.id, name, timestamp)
     )
     
     workout_id = db.select("SELECT LASTVAL()")[0][0]

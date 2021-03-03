@@ -16,26 +16,23 @@ class User(UserMixin): # inherits is_authenticated, is_actgive, is_anonymous, ge
                 "SELECT email FROM public.user"
             )
 
-            if emails != []: # reformat to a list if need to check emails
-                emails = emails[0] 
+            for email in emails:
+                if email[0] == param: # if a user with the same email is found, then we want to return the user data
+                    data = db.select(
+                        "SELECT * FROM public.user WHERE email='%s'" % (param)
+                    )[0]
 
-            if param in emails: # if a user with the same email is found, then we want to return the user data
-                data = db.select(
-                    "SELECT * FROM public.user WHERE email='%s'" % (param)
-                )[0]
 
         elif type == "id":
             ids = db.select(
                 "SELECT id FROM public.user"
             )
 
-            if ids != []:
-                ids = ids[0]
-
-            if param in ids:
-                data = db.select(
-                    "SELECT * FROM public.user WHERE id='%d'" % (param)
-                )[0]
+            for id_ in ids:
+                if id_[0] == param: # if a user with the same email is found, then we want to return the user data
+                    data = db.select(
+                        "SELECT * FROM public.user WHERE id='%s'" % (param)
+                    )[0]
 
         user = User(data[0],data[1],data[2],data[3])
         return user
