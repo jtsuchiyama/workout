@@ -18,10 +18,15 @@ def profile():
 
     return render_template('profile.html', workouts=workouts, name=current_user.name)
 
-@main.route('/newlog')
+@main.route('/newlog/<int:workout_id>')
 @login_required
-def log_workout():
-    return render_template('newlog.html')
+def log_workout(workout_id):
+    db = Database()
+
+    query = "SELECT * FROM set WHERE workout_id = " + str(workout_id)
+    sets = db.select(query)
+    
+    return render_template('newlog.html', sets=sets)
 
 @main.route('/newlog', methods=['POST'])
 def log_post():
