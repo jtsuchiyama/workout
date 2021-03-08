@@ -23,12 +23,19 @@ def profile():
 def log_workout(workout_id):
     db = Database()
 
+    query = "SELECT name FROM workout WHERE id = " + str(workout_id)
+    name = db.select(query)
+    if name == []:
+        name = "New Workout"
+    else:
+        name = name[0][0]
+
     query = "SELECT * FROM set WHERE workout_id = " + str(workout_id)
     sets = db.select(query)
     
-    return render_template('newlog.html', sets=sets)
+    return render_template('newlog.html', name=name, sets=sets)
 
-@main.route('/newlog', methods=['POST'])
+@main.route('/newlog/', methods=['POST'])
 def log_post():
     names = request.form.getlist('name')
     types = request.form.getlist('typ')

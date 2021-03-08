@@ -62,10 +62,10 @@
 </HEAD>
 
 <h3 class="title">
-  Workout {{ sets }}
+   {{ name }}
 </h3>
 <div class="box">
-    <form method="POST" action="/newlog">
+    <form method="POST" action="{{ url_for('main.log_post') }}">
         <BODY>
 
             <INPUT type="button" class="button is-block is-info is-large is-fullwidth" value="Add Row" onclick="addRow('dataTable')" />
