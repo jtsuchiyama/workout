@@ -62,7 +62,7 @@
 </HEAD>
 
 <h3 class="title">
-   {{ name }} {{ sets }}
+   {{ name }}
 </h3>
 <div class="box">
     <form method="POST" action="{{ url_for('main.log_post') }}">
@@ -88,8 +88,9 @@
                     </TD>
                     <TD><INPUT type="number" name="weight" placeholder="Weight"/></TD>
                     <TD><INPUT type="number" name="reps" placeholder="Reps"/></TD>
-                    
                 </TR>
+
+				<INPUT type="hidden" name="workout_id"  value="{{ workout_id }}">
             </TABLE>
 
 			<script>	

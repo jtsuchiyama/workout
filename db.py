@@ -47,3 +47,21 @@ class Database:
             self.conn.commit()
             cur.close()
             return f"{cur.rowcount} rows affected."
+
+    def delete(self, query):
+        """Run a SQL query to delete a row in a table."""
+        with self.conn.cursor() as cur:
+            cur.execute(query)
+            self.conn.commit()
+            cur.close()
+            return f"{cur.rowcount} rows affected."
+
+    def update(self, query, values):
+        """Run a SQL query to update a row in a table."""
+        with self.conn.cursor() as cur:
+            cur.execute(query, values)
+            self.conn.commit()
+            cur.close()
+            return f"{cur.rowcount} rows affected."
+
+

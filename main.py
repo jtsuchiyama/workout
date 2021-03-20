@@ -18,9 +18,11 @@ def profile():
 
     return render_template('profile.html', workouts=workouts, name=current_user.name)
 
-@main.route('/newlog/<int:workout_id>')
+@main.route('/newlog/')
 @login_required
-def log_workout(workout_id):
+def log_workout():
+    workout_id = request.args.get("workout_id")
+    
     db = Database()
 
     query = "SELECT name FROM workout WHERE id = " + str(workout_id)
@@ -33,7 +35,7 @@ def log_workout(workout_id):
     query = "SELECT * FROM set WHERE workout_id = " + str(workout_id)
     sets = db.select(query)
 
-    return render_template('newlog.html', name=name, sets=sets)
+    return render_template('newlog.html', name=name, sets=sets, workout_id=workout_id)
 
 @main.route('/newlog/', methods=['POST'])
 def log_post():
@@ -41,6 +43,7 @@ def log_post():
     types = request.form.getlist('typ')
     weights = request.form.getlist('weight')
     reps = request.form.getlist('reps')
+    workout_id = int(request.form.get('workout_id'))
 
     name = ""
     for typ in types:
@@ -54,13 +57,20 @@ def log_post():
     timestamp = "hi"
 
     db = Database()
-    db.add(
+    
+    if workout_id == 0: 
+        workout_id = db.select("SELECT LASTVAL()")[0][0]
+
+        db.add(
         """INSERT INTO workout (user_id, name, timestamp) 
             VALUES(%s, %s, %s)""", 
             (current_user.id, name, timestamp)
-    )
-    
-    workout_id = db.select("SELECT LASTVAL()")[0][0]
+        )
+    else:
+        query = "DELETE FROM set WHERE workout_id = " + str(workout_id)
+        db.delete(query)
+
+        db.update("UPDATE workout SET name = %s WHERE id = %s", (name, str(workout_id)))
 
     for x in range(len(names)):
         db.add(
