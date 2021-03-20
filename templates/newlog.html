@@ -62,12 +62,11 @@
 </HEAD>
 
 <h3 class="title">
-   {{ name }}
+   {{ name }} {{ sets }}
 </h3>
 <div class="box">
     <form method="POST" action="{{ url_for('main.log_post') }}">
         <BODY>
-
             <INPUT type="button" class="button is-block is-info is-large is-fullwidth" value="Add Row" onclick="addRow('dataTable')" />
         
             <INPUT type="button" class="button is-block is-info is-large is-fullwidth" value="Delete Row" onclick="deleteRow('dataTable')" />
@@ -92,6 +91,20 @@
                     
                 </TR>
             </TABLE>
+
+			<script>	
+				var sets = {{ sets|tojson }};
+				var table = document.getElementById('dataTable');
+				for(var i=0; i<sets.length; i++){
+					addRow('dataTable');
+
+					var row = table.rows[i];
+					for(var j=1; j<5; j++) {
+						row.cells[j].childNodes[0].value = sets[i][j];
+					}			
+				}
+			</script>
+
         </BODY>
 
         <button class="button is-block is-info is-large is-fullwidth">Log workout</button>

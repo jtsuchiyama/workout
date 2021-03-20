@@ -32,7 +32,7 @@ def log_workout(workout_id):
 
     query = "SELECT * FROM set WHERE workout_id = " + str(workout_id)
     sets = db.select(query)
-    
+
     return render_template('newlog.html', name=name, sets=sets)
 
 @main.route('/newlog/', methods=['POST'])
