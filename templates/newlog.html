@@ -43,7 +43,7 @@
 				var chkbox = row.cells[0].childNodes[0];
 				if(null != chkbox && true == chkbox.checked) {
 					if(rowCount <= 1) {
-						alert("Cannot delete all the rows.");
+						alert("You must have at least one set in your workout!");
 						break;
 					}
 					table.deleteRow(i);
@@ -67,9 +67,9 @@
 <div class="box">
     <form method="POST" action="{{ url_for('main.log_post') }}">
         <BODY>
-            <INPUT type="button" class="button is-block is-info is-large is-fullwidth" value="Add Row" onclick="addRow('dataTable')" />
+            <INPUT type="button" class="button is-block is-info is-large is-fullwidth" value="Add Set" onclick="addRow('dataTable')" />
         
-            <INPUT type="button" class="button is-block is-info is-large is-fullwidth" value="Delete Row" onclick="deleteRow('dataTable')" />
+            <INPUT type="button" class="button is-block is-info is-large is-fullwidth" value="Delete Set" onclick="deleteRow('dataTable')" />
         
             <TABLE id="dataTable" width="350px" border="1">
                 <TR>
@@ -77,13 +77,13 @@
                     <TD><INPUT type="text" name="name" placeholder="Exercise Name"/></TD>
                     <TD>
                         <SELECT name="typ" placeholder="Other">
-                            <OPTION value="Other">Other</OPTION>
                             <OPTION value="Abs">Abs</OPTION>
                             <OPTION value="Back">Back</OPTION>
                             <OPTION value="Bicep">Bicep</OPTION>
                             <OPTION value="Chest">Chest</OPTION>
                             <OPTION value="Legs">Legs</OPTION>
                             <OPTION value="Tricep">Tricep</OPTION>
+							<OPTION value="Other">Other</OPTION>
                         </SELECT>
                     </TD>
                     <TD><INPUT type="number" name="weight" placeholder="Weight"/></TD>
@@ -96,14 +96,30 @@
 			<script>	
 				var sets = {{ sets|tojson }};
 				var table = document.getElementById('dataTable');
+
+				var options = ["Abs","Back","Bicep","Chest","Legs","Tricep","Other"];
 				for(var i=0; i<sets.length; i++){
 					addRow('dataTable');
 
 					var row = table.rows[i];
+
+					
 					for(var j=1; j<5; j++) {
-						row.cells[j].childNodes[0].value = sets[i][j];
+						if (row.cells[j].childNodes[0].type == undefined) {
+							for(var k=0; k<7; k++) 
+								if (sets[i][j] == options[k])
+									row.cells[j].childNodes[1].selectedIndex = k;
+						}
+
+						else
+							row.cells[j].childNodes[0].value = sets[i][j];
 					}			
 				}
+				if (i != 0) {
+					table.deleteRow(i);
+				}
+
+					
 			</script>
 
         </BODY>
