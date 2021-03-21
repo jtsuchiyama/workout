@@ -1,15 +1,19 @@
 import psycopg2
 from loguru import logger
+from os import environ, path
+from dotenv import load_dotenv
 
 class Database:
     """PostgreSQL Database class."""
 
     def __init__(self):
-        self.host = "localhost"
-        self.username = "postgres"
-        self.password = "poke3271"
-        self.port = 5432
-        self.dbname = "Exercise"
+        basedir = path.abspath(path.dirname(__file__))
+        load_dotenv(path.join(basedir, '.env'))
+        self.host = environ.get("DATABASE_HOST")
+        self.username = environ.get("DATABASE_USERNAME")
+        self.password = environ.get("DATABASE_PASSWORD")
+        self.port = environ.get("DATABASE_PORT")
+        self.dbname = environ.get("DATABASE_NAME")
         self.conn = None
         self.connect()
 
