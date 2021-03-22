@@ -34,8 +34,6 @@ class Database:
             finally:
                 logger.info('Connection opened successfully.')
 
-        
-
     def select(self, query):
         """Run a SQL query to select the data from a table."""
         with self.conn.cursor() as cur:
