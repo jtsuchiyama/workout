@@ -1,6 +1,8 @@
 from flask import Blueprint, render_template, request, redirect, url_for
 from flask_login import login_required, current_user
 from .db import Database
+import datetime
+import pytz
 
 main = Blueprint('main', __name__)
 
@@ -16,6 +18,19 @@ def profile():
     query = "SELECT * FROM workout WHERE user_id = " + str(current_user.id)
     workouts = db.select(query)
 
+    timezone = current_user.timezone
+    index = 0
+    for workout in workouts:
+        timestamp = datetime.datetime.strptime(workout[3], "%Y-%m-%d %H:%M:%S.%f%z")
+        timestamp = timestamp.astimezone(pytz.timezone(timezone))
+        timestamp = timestamp.strftime("%Y-%m-%d %H:%M:%S")
+        workout = list(workout)
+        workout[3] = str(timestamp)
+        workout = tuple(workout)
+        workouts[index] = workout
+        index += 1
+        
+    print(workout)
     return render_template('profile.html', workouts=workouts, name=current_user.name)
 
 @main.route('/newlog/')
@@ -54,18 +69,19 @@ def log_post():
                 name = name + "/" + typ
     name = name + " Workout"
 
-    timestamp = "hi"
+    timestamp = str(pytz.utc.localize(datetime.datetime.utcnow())) + "00"
 
     db = Database()
     
     if workout_id == 0: 
-        workout_id = db.select("SELECT LASTVAL()")[0][0]
-
         db.add(
         """INSERT INTO workout (user_id, name, timestamp) 
             VALUES(%s, %s, %s)""", 
             (current_user.id, name, timestamp)
         )
+
+        workout_id = db.select("SELECT LASTVAL()")[0][0]
+
     else:
         query = "DELETE FROM set WHERE workout_id = " + str(workout_id)
         db.delete(query)
