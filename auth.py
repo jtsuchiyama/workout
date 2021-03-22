@@ -37,6 +37,7 @@ def signup_post():
     email = request.form.get('email')
     name = request.form.get('name')
     password = request.form.get('password')
+    timezone = request.form.get('timezone')
 
     db = Database()
     emails = db.select(
@@ -51,9 +52,9 @@ def signup_post():
 
     password=generate_password_hash(password, method='sha256')
     db.add(
-        """INSERT INTO public.user (email, password, name) 
-        VALUES(%s, %s, %s)""", 
-        (email, password, name)
+        """INSERT INTO public.user (email, password, name, timezone) 
+        VALUES(%s, %s, %s, %s)""", 
+        (email, password, name, timezone)
     )
 
     return redirect(url_for('auth.login'))
