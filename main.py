@@ -4,13 +4,13 @@ from .db import Database
 import datetime
 import pytz
 
-main = Blueprint('main', __name__)
+main = Blueprint("main", __name__)
 
-@main.route('/')
+@main.route("/")
 def index():
-    return render_template('index.html')
+    return render_template("index.html")
 
-@main.route('/profile')
+@main.route("/profile")
 @login_required
 def profile():
     db = Database()
@@ -30,9 +30,9 @@ def profile():
         workouts[index] = workout
         index += 1
         
-    return render_template('profile.html', workouts=workouts, name=current_user.name)
+    return render_template("profile.html", workouts=workouts, name=current_user.name)
 
-@main.route('/newlog/')
+@main.route("/newlog/")
 @login_required
 def log_workout():
     workout_id = request.args.get("workout_id")
@@ -49,15 +49,15 @@ def log_workout():
     query = "SELECT * FROM set WHERE workout_id = " + str(workout_id)
     sets = db.select(query)
 
-    return render_template('newlog.html', name=name, sets=sets, workout_id=workout_id)
+    return render_template("newlog.html", name=name, sets=sets, workout_id=workout_id)
 
-@main.route('/newlog/', methods=['POST'])
+@main.route("/newlog/", methods=["POST"])
 def log_post():
-    names = request.form.getlist('name')
-    types = request.form.getlist('typ')
-    weights = request.form.getlist('weight')
-    reps = request.form.getlist('reps')
-    workout_id = int(request.form.get('workout_id'))
+    names = request.form.getlist("name")
+    types = request.form.getlist("typ")
+    weights = request.form.getlist("weight")
+    reps = request.form.getlist("reps")
+    workout_id = int(request.form.get("workout_id"))
 
     name = ""
     for typ in types:
@@ -94,4 +94,4 @@ def log_post():
             (names[x], types[x], weights[x], reps[x], current_user.id, workout_id)
         )
 
-    return redirect(url_for('main.profile'))
+    return redirect(url_for("main.profile"))

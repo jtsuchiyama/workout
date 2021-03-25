@@ -8,11 +8,11 @@ def create_app():
     app = Flask(__name__)
 
     basedir = path.abspath(path.dirname(__file__))
-    load_dotenv(path.join(basedir, '.env'))
-    app.config['SECRET_KEY'] = environ.get("SECRET_KEY")
+    load_dotenv(path.join(basedir, ".env"))
+    app.config["SECRET_KEY"] = environ.get("SECRET_KEY")
 
     login_manager = LoginManager()
-    login_manager.login_view = 'auth.login'
+    login_manager.login_view = "auth.login"
     login_manager.init_app(app)
 
     from .models import User

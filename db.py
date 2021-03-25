@@ -8,7 +8,7 @@ class Database:
 
     def __init__(self):
         basedir = path.abspath(path.dirname(__file__))
-        load_dotenv(path.join(basedir, '.env'))
+        load_dotenv(path.join(basedir, ".env"))
         self.host = environ.get("DATABASE_HOST")
         self.username = environ.get("DATABASE_USERNAME")
         self.password = environ.get("DATABASE_PASSWORD")
@@ -32,7 +32,7 @@ class Database:
                 logger.error(e)
                 raise e
             finally:
-                logger.info('Connection opened successfully.')
+                logger.info("Connection opened successfully.")
 
     def select(self, query):
         """Run a SQL query to select the data from a table."""
