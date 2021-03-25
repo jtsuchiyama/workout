@@ -1,7 +1,8 @@
 from flask_login import UserMixin
 from .db import Database
 
-class User(UserMixin): # inherits is_authenticated, is_actgive, is_anonymous, get_id()
+class User(UserMixin): 
+    # Inherits is_authenticated, is_actgive, is_anonymous, get_id() from UserMixin
     def __init__(self,id,email,password,name, timezone):
         self.id = id
         self.email = email
@@ -10,7 +11,8 @@ class User(UserMixin): # inherits is_authenticated, is_actgive, is_anonymous, ge
         self.timezone = timezone
 
     @staticmethod
-    def get_user(param, type): # returns the user data based on if an email or id is passed
+    def get_user(param, type): 
+        """Queries and returns the model for the user either through passing the email or user_id"""
         db = Database()
         if type == "email":
             emails = db.select(
@@ -18,7 +20,8 @@ class User(UserMixin): # inherits is_authenticated, is_actgive, is_anonymous, ge
             )
 
             for email in emails:
-                if email[0] == param: # if a user with the same email is found, then we want to return the user data
+                if email[0] == param: 
+                    # If a user with the same email is found, then we want to return the user data
                     data = db.select(
                         "SELECT * FROM public.user WHERE email='%s'" % (param)
                     )[0]
@@ -30,7 +33,8 @@ class User(UserMixin): # inherits is_authenticated, is_actgive, is_anonymous, ge
             )
 
             for id_ in ids:
-                if id_[0] == param: # if a user with the same email is found, then we want to return the user data
+                if id_[0] == param: 
+                    # If a user with the same id is found, then we want to return the user data
                     data = db.select(
                         "SELECT * FROM public.user WHERE id='%s'" % (param)
                     )[0]

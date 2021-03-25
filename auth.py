@@ -18,13 +18,13 @@ def login_post():
 
     user = User.get_user(email,"email")
 
-    # check if the user actually exists
-    # take the user-supplied password, hash it, and compare it to the hashed password in the database
+    # Checks if the user exists
+    # Takes the user-supplied password, hashes it, and compares it to the hashed password in the database
     if not user or not check_password_hash(user.password, password):
         flash("Please check your login details and try again.")
-        return redirect(url_for("auth.login")) # if the user doesn't exist or password is wrong, reload the page
+        return redirect(url_for("auth.login")) # If the user doesn't exist or password is wrong, reload the page
 
-    # if the above check passes, then we know the user has the right credentials
+    # If the above check passes, then we know the user has the right credentials, thus login
     login_user(user, remember=remember)
     return redirect(url_for("main.profile"))
 
@@ -43,13 +43,16 @@ def signup_post():
     emails = db.select(
         "SELECT email FROM public.user"
     )
-    if emails != []: # reformat to a list if need to check emails
+    if emails != []: 
+        # Need to reformat since the actual list of emails is held within the returned tuple
         emails = emails[0] 
 
-    if email in emails: # if a user with the same email is found, we want to redirect back to signup page so user can try again
+    if email in emails: 
+        # If a user with the same email is found, we want to redirect back to signup page
         flash("Email address already exists")
         return redirect(url_for("auth.signup"))
 
+    # If the email is not already used, then we want to hash the password and add the user to the database
     password=generate_password_hash(password, method="sha256")
     db.add(
         """INSERT INTO public.user (email, password, name, timezone) 

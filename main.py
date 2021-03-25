@@ -21,9 +21,12 @@ def profile():
     timezone = current_user.timezone
     index = 0
     for workout in workouts:
+        # Read the timestamps from the database and shift to the user's timezone
         timestamp = datetime.datetime.strptime(workout[3], "%Y-%m-%d %H:%M:%S.%f%z")
         timestamp = timestamp.astimezone(pytz.timezone(timezone))
         timestamp = timestamp.strftime("%Y-%m-%d %H:%M:%S")
+
+        # Change between list and tuple since tuples are not editable
         workout = list(workout)
         workout[3] = str(timestamp)
         workout = tuple(workout)
@@ -42,10 +45,13 @@ def log_workout():
     query = "SELECT name FROM workout WHERE id = " + str(workout_id)
     name = db.select(query)
     if name == []:
+        # Sets the name if the workout being created for the first time
         name = "New Workout"
     else:
+        # Grabs the name if the workout is old
         name = name[0][0]
 
+    # Query the sets in the workout to be rendered
     query = "SELECT * FROM set WHERE workout_id = " + str(workout_id)
     sets = db.select(query)
 
@@ -59,6 +65,7 @@ def log_post():
     reps = request.form.getlist("reps")
     workout_id = int(request.form.get("workout_id"))
 
+    # Creates the name for the workout
     name = ""
     for typ in types:
         if typ not in name:
@@ -68,11 +75,13 @@ def log_post():
                 name = name + "/" + typ
     name = name + " Workout"
 
+    # Creates the timestamp relative to a timezone
     timestamp = str(pytz.utc.localize(datetime.datetime.utcnow())) + "00"
 
     db = Database()
     
     if workout_id == 0: 
+        # If the workout is being created for the first time, then add the workout to the database
         db.add(
         """INSERT INTO workout (user_id, name, timestamp) 
             VALUES(%s, %s, %s)""", 
@@ -82,11 +91,13 @@ def log_post():
         workout_id = db.select("SELECT LASTVAL()")[0][0]
 
     else:
+        # If the workout is old, then delete the old sets from the workout and update the workout information
         query = "DELETE FROM set WHERE workout_id = " + str(workout_id)
         db.delete(query)
 
         db.update("UPDATE workout SET name = %s WHERE id = %s", (name, str(workout_id)))
 
+    # Adds all of the sets to the database
     for x in range(len(names)):
         db.add(
             """INSERT INTO set (name, typ, weight, reps, user_id, workout_id) 
