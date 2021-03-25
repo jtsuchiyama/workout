@@ -1,12 +1,15 @@
 from flask import Flask
 from flask_migrate import Migrate
 from flask_login import LoginManager
-
+from os import environ, path
+from dotenv import load_dotenv
 
 def create_app():
     app = Flask(__name__)
 
-    app.config['SECRET_KEY'] = 'secret-key-goes-here'
+    basedir = path.abspath(path.dirname(__file__))
+    load_dotenv(path.join(basedir, '.env'))
+    app.config['SECRET_KEY'] = environ.get("SECRET_KEY")
 
     login_manager = LoginManager()
     login_manager.login_view = 'auth.login'
