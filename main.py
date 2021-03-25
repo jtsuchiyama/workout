@@ -30,7 +30,6 @@ def profile():
         workouts[index] = workout
         index += 1
         
-    print(workout)
     return render_template('profile.html', workouts=workouts, name=current_user.name)
 
 @main.route('/newlog/')
