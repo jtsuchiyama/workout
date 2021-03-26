@@ -108,3 +108,18 @@ def log_post():
         )
 
     return redirect(url_for("main.profile"))
+
+@main.route("/deletelog/")
+def del_workout():
+    workout_id = request.args.get("workout_id")
+    print(workout_id)
+    
+    db = Database()
+
+    query = "DELETE FROM workout WHERE id = " + str(workout_id)
+    db.delete(query)
+    
+    query = "DELETE FROM set WHERE workout_id = " + str(workout_id)
+    db.delete(query)
+
+    return redirect(url_for("main.profile"))
