@@ -2,8 +2,8 @@
 
 {% block content %}
 <HEAD>
-	<TITLE> Add/Remove dynamic rows in HTML table </TITLE>
 	<SCRIPT language="javascript">
+		// addRow and deleteRow functions credit to ViralPatel
 		function addRow(tableID) {
 
 			var table = document.getElementById(tableID);
@@ -18,7 +18,8 @@
 				var newcell	= row.insertCell(i);
 
 				newcell.innerHTML = table.rows[0].cells[i].innerHTML;
-				//alert(newcell.childNodes);
+
+				// Sets the default values in the cells depending on what type of the data they hold
 				switch(newcell.childNodes[0].type) {
 					case "text":
 							newcell.childNodes[0].value = "";
@@ -42,6 +43,7 @@
 				var row = table.rows[i];
 				var chkbox = row.cells[0].childNodes[0];
 				if(null != chkbox && true == chkbox.checked) {
+					// Checks if there is a row that should and can be deleted
 					if(rowCount <= 1) {
 						alert("You must have at least one set in your workout!");
 						break;
@@ -88,34 +90,43 @@
                     </TD>
                     <TD><INPUT type="number" name="weight" placeholder="Weight"/></TD>
                     <TD><INPUT type="number" name="reps" placeholder="Reps"/></TD>
+					<TD><INPUT type="number" name="sets" placeholder="Sets"/></TD>
                 </TR>
 
 				<INPUT type="hidden" name="workout_id"  value="{{ workout_id }}">
             </TABLE>
 
 			<script>	
+				// Change sets to json format so that the Python list can be parsed
 				var sets = {{ sets|tojson }};
 				var table = document.getElementById('dataTable');
 
 				var options = ["Abs","Back","Bicep","Chest","Legs","Tricep","Other"];
 				for(var i=0; i<sets.length; i++){
+					// Loads the cells with the information from the workout
 					addRow('dataTable');
 
 					var row = table.rows[i];
 
-					
-					for(var j=1; j<5; j++) {
+					for(var j=1; j<row.cells.length; j++) {
 						if (row.cells[j].childNodes[0].type == undefined) {
+							// If the node is a dropdown, then find and set the approriate exercise type
 							for(var k=0; k<7; k++) 
 								if (sets[i][j] == options[k])
 									row.cells[j].childNodes[1].selectedIndex = k;
 						}
 
 						else
-							row.cells[j].childNodes[0].value = sets[i][j];
+							if (row.cells[j].childNodes[0].name === "sets")
+								// Sets the approriate value for the amount of sets
+								row.cells[j].childNodes[0].value = sets[i][7];
+							else
+								// Sets the approriate values for the cells besides the amount of sets
+								row.cells[j].childNodes[0].value = sets[i][j];
 					}			
 				}
 				if (i != 0) {
+					// Gets rid of the extra row that gets created
 					table.deleteRow(i);
 				}
 

@@ -63,7 +63,9 @@ def log_post():
     types = request.form.getlist("typ")
     weights = request.form.getlist("weight")
     reps = request.form.getlist("reps")
+    sets = request.form.getlist("sets")
     workout_id = int(request.form.get("workout_id"))
+
 
     # Creates the name for the workout
     name = ""
@@ -100,9 +102,9 @@ def log_post():
     # Adds all of the sets to the database
     for x in range(len(names)):
         db.add(
-            """INSERT INTO set (name, typ, weight, reps, user_id, workout_id) 
-            VALUES(%s, %s, %s, %s, %s, %s)""", 
-            (names[x], types[x], weights[x], reps[x], current_user.id, workout_id)
+            """INSERT INTO set (name, typ, weight, reps, user_id, workout_id, sets) 
+            VALUES(%s, %s, %s, %s, %s, %s, %s)""", 
+            (names[x], types[x], weights[x], reps[x], current_user.id, workout_id, sets[x])
         )
 
     return redirect(url_for("main.profile"))
