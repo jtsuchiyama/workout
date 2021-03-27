@@ -1,5 +1,5 @@
 from flask_login import UserMixin
-from .db import Database
+from db import Database
 
 class User(UserMixin): 
     # Inherits is_authenticated, is_actgive, is_anonymous, get_id() from UserMixin

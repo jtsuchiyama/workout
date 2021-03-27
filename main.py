@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, request, redirect, url_for
 from flask_login import login_required, current_user
-from .db import Database
+from db import Database
 import datetime
 import pytz
 
@@ -112,13 +112,11 @@ def log_post():
 @main.route("/deletelog/")
 def del_workout():
     workout_id = request.args.get("workout_id")
-    print(workout_id)
     
     db = Database()
 
     query = "DELETE FROM workout WHERE id = " + str(workout_id)
     db.delete(query)
-    
     query = "DELETE FROM set WHERE workout_id = " + str(workout_id)
     db.delete(query)
 
