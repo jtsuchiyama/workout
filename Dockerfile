@@ -8,6 +8,8 @@ ADD *.py /
 
 ADD templates /templates 
 
+ADD .env / 
+
 EXPOSE 5000
 
 EXPOSE 8000
