@@ -44,10 +44,13 @@ def log_workout():
 
     query = "SELECT user_id FROM workout WHERE id = " + str (workout_id)
     user_id = db.select(query)
-    user_id = user_id[0][0] # Reformat the query result to get the user_id associated with the workout
-    if int(user_id) != current_user.id:
-        # If the current user does not log the workout, then redirect them
-        return redirect(url_for("main.profile"))
+    if user_id != []:
+        # If the workout is not new
+        user_id = db.select(query)
+        user_id = user_id[0][0] # Reformat the query result to get the user_id associated with the workout
+        if int(user_id) != current_user.id:
+            # If the current user does not log the workout, then redirect them
+            return redirect(url_for("main.profile"))
 
     query = "SELECT name FROM workout WHERE id = " + str(workout_id)
     name = db.select(query)
