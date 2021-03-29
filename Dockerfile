@@ -8,6 +8,8 @@ ADD *.py /
 
 ADD templates /templates 
 
+ADD static /static
+
 ADD .env / 
 
 EXPOSE 5000

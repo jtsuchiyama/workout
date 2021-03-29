@@ -12,7 +12,7 @@
 <div class="box">
   <ul>
       {% for workout in workouts %}
-        <li><a href="{{ url_for('main.log_workout', workout_id = workout[0]) }}">({{ workout[2] }} {{ workout[3] }})</a> [<a href="{{ url_for('main.del_workout', workout_id = workout[0])}}">DELETE WORKOUT</a>]</li>
+        <li><a href="{{ url_for('main.log_workout', workout_id = workout[0]) }}">{{ workout[2] }} {{ workout[3] }}</a><a href="{{ url_for('main.del_workout', workout_id = workout[0])}}"><img src="{{ url_for('static', filename='trashcan.jpg')}}" width="20" height="20"></a></li>
       {% endfor %}
   </ul>
 </div>
