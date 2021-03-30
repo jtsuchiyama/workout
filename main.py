@@ -24,7 +24,8 @@ def profile():
         # Read the timestamps from the database and shift to the user's timezone
         timestamp = datetime.datetime.strptime(workout[3], "%Y-%m-%d %H:%M:%S.%f%z")
         timestamp = timestamp.astimezone(pytz.timezone(timezone))
-        timestamp = timestamp.strftime("%Y-%m-%d %H:%M:%S")
+        timestamp = timestamp.strftime("%m-%d-%Y %H:%M")
+        
 
         # Change between list and tuple since tuples are not editable
         workout = list(workout)
@@ -88,7 +89,7 @@ def log_post():
     name = name + " Workout"
 
     # Creates the timestamp relative to a timezone
-    timestamp = str(pytz.utc.localize(datetime.datetime.utcnow())) + "00"
+    timestamp = str(pytz.utc.localize(datetime.datetime.utcnow()))
 
     db = Database()
     
