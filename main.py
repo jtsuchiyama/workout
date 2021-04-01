@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, redirect, url_for
+from flask import Blueprint, render_template, request, redirect, url_for, flash
 from flask_login import login_required, current_user
 from db import Database
 import datetime
@@ -57,6 +57,7 @@ def log_workout():
         user_id = user_id[0][0] # Reformat the query result to get the user_id associated with the workout
         if int(user_id) != current_user.id:
             # If the current user does not own the workout, then redirect them
+            flash("Do not attempt to access other user's workouts")
             return redirect(url_for("main.profile"))
 
     query = "SELECT * FROM workout WHERE user_id = " + str(current_user.id)
@@ -95,10 +96,10 @@ def log_post():
         user_id = db.select(query)
         if user_id != []:
             # If the workout is not new
-            user_id = db.select(query)
             user_id = user_id[0][0] # Reformat the query result to get the user_id associated with the workout
             if int(user_id) != current_user.id:
                 # If the current user does not own the workout, then redirect them
+                flash("Do not attempt to access other user's workouts")
                 return redirect(url_for("main.profile"))
 
         query = "SELECT * FROM workout WHERE user_id = " + str(current_user.id)
@@ -128,6 +129,7 @@ def log_post():
 
         if len(names) or len(types) or len(weights) or len (reps) or len(sets) == 0 or not (len(names) == len(types) == len(weights) == len (reps) == len(sets)):
             # Prevents the workout from being logged if there are blanks
+            flash("Make sure that all cells are filled out when logging workouts")
             return redirect(url_for("main.profile"))
 
         # Creates the name for the workout
