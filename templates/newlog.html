@@ -120,11 +120,13 @@
 </h3>
 
 <div class="box">
-	<!--<form action="">
-		<select id="importSelect"></select> 
+	<form method="POST" action="{{ url_for('main.log_post') }}">
+		<select id="import_id" name="import_id"></select> 
 		
-		<button class="button is-block is-info is-large is-fullwidth">Load workout</button>
-	</form>-->
+		<button class="button is-block is-info is-large is-fullwidth" name="load" value="Load">Import workout</button>
+
+		<INPUT type="hidden" name="workout_id" value="{{ workout_id }}">
+	</form>
 </div>
 
 <div class="box">
@@ -194,7 +196,7 @@
 			<script language="javascript">
 				// Change sets to json format so that the Python list can be parsed
 				var workouts = {{ workouts|tojson }};
-				var select = document.getElementById('importSelect');
+				var select = document.getElementById('import_id');
 
 				for(var i=0;i<workouts.length;i++) {
 					var flag = 1;

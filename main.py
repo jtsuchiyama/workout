@@ -36,7 +36,7 @@ def profile():
         
     return render_template("profile.html", workouts=workouts, name=current_user.name)
 
-@main.route("/newlog/")
+@main.route("/newlog/", methods=["GET"])
 @login_required
 def log_workout():
     workout_id = request.args.get("workout_id")
@@ -71,65 +71,103 @@ def log_workout():
         # Grabs the name if the workout is old
         name = name[0][0]
 
-    # Query the sets in the workout to be rendered
     query = "SELECT * FROM set WHERE workout_id = " + str(workout_id)
     sets = db.select(query)
-
     return render_template("newlog.html", name=name, sets=sets, workout_id=workout_id, workouts=workouts)
 
 @main.route("/newlog/", methods=["POST"])
 @login_required
 def log_post():
-    names = request.form.getlist("name")
-    types = request.form.getlist("typ")
-    weights = request.form.getlist("weight")
-    reps = request.form.getlist("reps")
-    sets = request.form.getlist("sets")
-    workout_id = int(request.form.get("workout_id"))
+    if "load" in request.form:
+        # If importing a workout into a new workout
+        workout_id = request.form.get("workout_id")
+        import_id = request.form.get("import_id")
 
+        db = Database()
 
-    # Creates the name for the workout
-    name = ""
-    type_list = ["Abs","Back","Bicep","Chest","Legs","Tricep","Other"]
-    for typ in type_list:
-        if typ in types:
-            if name == "":
-                name = typ
-            else:
-                name = name + "/" + typ 
-    name = name + " Workout"
+        query = "SELECT EXISTS(SELECT 1 FROM workout WHERE id = " + str(workout_id) + ")"
+        workout_exist = db.select(query)
+        if workout_exist[0][0] == False:
+            # Ensures that the next available workout ID is used
+            workout_id = 0
 
-    # Creates the timestamp relative to a timezone
-    timestamp = str(pytz.utc.localize(datetime.datetime.utcnow()))
+        query = "SELECT user_id FROM workout WHERE id = " + str(workout_id)
+        user_id = db.select(query)
+        if user_id != []:
+            # If the workout is not new
+            user_id = db.select(query)
+            user_id = user_id[0][0] # Reformat the query result to get the user_id associated with the workout
+            if int(user_id) != current_user.id:
+                # If the current user does not own the workout, then redirect them
+                return redirect(url_for("main.profile"))
 
-    db = Database()
-    
-    if workout_id == 0: 
-        # If the workout is being created for the first time, then add the workout to the database
-        db.add(
-        """INSERT INTO workout (user_id, name, timestamp) 
-            VALUES(%s, %s, %s)""", 
-            (current_user.id, name, timestamp)
-        )
+        query = "SELECT * FROM workout WHERE user_id = " + str(current_user.id)
+        workouts = db.select(query)
 
-        workout_id = db.select("SELECT LASTVAL()")[0][0]
+        query = "SELECT name FROM workout WHERE id = " + str(workout_id)
+        name = db.select(query)
+        if name == []:
+            # Sets the name if the workout being created for the first time
+            name = "New Workout"
+        else:
+            # Grabs the name if the workout is old
+            name = name[0][0]
+
+        query = "SELECT * FROM set WHERE workout_id = " + str(import_id)
+        sets = db.select(query)
+        return render_template("newlog.html", name=name, sets=sets, workout_id=workout_id, workouts=workouts)
 
     else:
-        # If the workout is old, then delete the old sets from the workout and update the workout information
-        query = "DELETE FROM set WHERE workout_id = " + str(workout_id)
-        db.delete(query)
+        # If logging a new workout
+        names = request.form.getlist("name")
+        types = request.form.getlist("typ")
+        weights = request.form.getlist("weight")
+        reps = request.form.getlist("reps")
+        sets = request.form.getlist("sets")
+        workout_id = int(request.form.get("workout_id"))
 
-        db.update("UPDATE workout SET name = %s WHERE id = %s", (name, str(workout_id)))
+        # Creates the name for the workout
+        name = ""
+        type_list = ["Abs","Back","Bicep","Chest","Legs","Tricep","Other"]
+        for typ in type_list:
+            if typ in types:
+                if name == "":
+                    name = typ
+                else:
+                    name = name + "/" + typ 
+        name = name + " Workout"
 
-    # Adds all of the sets to the database
-    for x in range(len(names)):
-        db.add(
-            """INSERT INTO set (name, typ, weight, reps, user_id, workout_id, sets) 
-            VALUES(%s, %s, %s, %s, %s, %s, %s)""", 
-            (names[x], types[x], weights[x], reps[x], current_user.id, workout_id, sets[x])
-        )
+        # Creates the timestamp relative to a timezone
+        timestamp = str(pytz.utc.localize(datetime.datetime.utcnow()))
 
-    return redirect(url_for("main.profile"))
+        db = Database()
+        
+        if workout_id == 0: 
+            # If the workout is being created for the first time, then add the workout to the database
+            db.add(
+            """INSERT INTO workout (user_id, name, timestamp) 
+                VALUES(%s, %s, %s)""", 
+                (current_user.id, name, timestamp)
+            )
+
+            workout_id = db.select("SELECT LASTVAL()")[0][0]
+
+        else:
+            # If the workout is old, then delete the old sets from the workout and update the workout information
+            query = "DELETE FROM set WHERE workout_id = " + str(workout_id)
+            db.delete(query)
+
+            db.update("UPDATE workout SET name = %s WHERE id = %s", (name, str(workout_id)))
+
+        # Adds all of the sets to the database
+        for x in range(len(names)):
+            db.add(
+                """INSERT INTO set (name, typ, weight, reps, user_id, workout_id, sets) 
+                VALUES(%s, %s, %s, %s, %s, %s, %s)""", 
+                (names[x], types[x], weights[x], reps[x], current_user.id, workout_id, sets[x])
+            )
+
+        return redirect(url_for("main.profile"))
 
 @main.route("/deletelog/")
 @login_required
