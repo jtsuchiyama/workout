@@ -126,6 +126,10 @@ def log_post():
         sets = request.form.getlist("sets")
         workout_id = int(request.form.get("workout_id"))
 
+        if len(names) or len(types) or len(weights) or len (reps) or len(sets) == 0 or not (len(names) == len(types) == len(weights) == len (reps) == len(sets)):
+            # Prevents the workout from being logged if there are blanks
+            return redirect(url_for("main.profile"))
+
         # Creates the name for the workout
         name = ""
         type_list = ["Abs","Back","Bicep","Chest","Legs","Tricep","Other"]
