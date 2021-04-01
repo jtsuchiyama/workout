@@ -67,6 +67,7 @@
 		only screen and (max-width: 760px),
 		(min-device-width: 768px) and (max-device-width: 1024px)  {
 			/* Credits to Chris Coyier for the CSS */
+			/* Mobile support for the table */
 
 			/* Force table to not be like tables anymore */
 			table, thead, tbody, th, td, tr { 
@@ -119,8 +120,11 @@
 </h3>
 
 <div class="box">
-	<form method="POST" action="">
-	</form>
+	<!--<form action="">
+		<select id="importSelect"></select> 
+		
+		<button class="button is-block is-info is-large is-fullwidth">Load workout</button>
+	</form>-->
 </div>
 
 <div class="box">
@@ -153,7 +157,7 @@
 				<INPUT type="hidden" name="workout_id"  value="{{ workout_id }}">
             </TABLE>
 
-			<script>	
+			<script language="javascript">	
 				// Change sets to json format so that the Python list can be parsed
 				var sets = {{ sets|tojson }};
 				var table = document.getElementById('dataTable');
@@ -186,8 +190,32 @@
 					// Gets rid of the extra row that gets created
 					table.deleteRow(i);
 				}
+			</script>
+			<script language="javascript">
+				// Change sets to json format so that the Python list can be parsed
+				var workouts = {{ workouts|tojson }};
+				var select = document.getElementById('importSelect');
 
+				for(var i=0;i<workouts.length;i++) {
+					var flag = 1;
+					for(var j=0;j<select.children.length;j++) {
+						if (workouts[j][2] == workouts[i][2]) {
+							if (i != j) {
+								// If the same workout name is already listed, then break and ignore that workout
+								flag = 0;
+								break;
+							}
+						}	
+					}
 					
+					if (flag == 1) {
+						// Adds the workout to the select tag if there is no workout with the same name in the select tag
+						var option = document.createElement("option");
+						option.value = workouts[i][0];
+						option.text = workouts[i][2];
+						select.appendChild(option);
+					}			
+				}
 			</script>
 
         </BODY>

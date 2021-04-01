@@ -40,18 +40,27 @@ def profile():
 @login_required
 def log_workout():
     workout_id = request.args.get("workout_id")
-    
+
     db = Database()
 
-    query = "SELECT user_id FROM workout WHERE id = " + str (workout_id)
+    query = "SELECT EXISTS(SELECT 1 FROM workout WHERE id = " + str(workout_id) + ")"
+    workout_exist = db.select(query)
+    if workout_exist[0][0] == False:
+        # Ensures that the next available workout ID is used
+        workout_id = 0
+
+    query = "SELECT user_id FROM workout WHERE id = " + str(workout_id)
     user_id = db.select(query)
     if user_id != []:
         # If the workout is not new
         user_id = db.select(query)
         user_id = user_id[0][0] # Reformat the query result to get the user_id associated with the workout
         if int(user_id) != current_user.id:
-            # If the current user does not log the workout, then redirect them
+            # If the current user does not own the workout, then redirect them
             return redirect(url_for("main.profile"))
+
+    query = "SELECT * FROM workout WHERE user_id = " + str(current_user.id)
+    workouts = db.select(query)
 
     query = "SELECT name FROM workout WHERE id = " + str(workout_id)
     name = db.select(query)
@@ -66,9 +75,10 @@ def log_workout():
     query = "SELECT * FROM set WHERE workout_id = " + str(workout_id)
     sets = db.select(query)
 
-    return render_template("newlog.html", name=name, sets=sets, workout_id=workout_id)
+    return render_template("newlog.html", name=name, sets=sets, workout_id=workout_id, workouts=workouts)
 
 @main.route("/newlog/", methods=["POST"])
+@login_required
 def log_post():
     names = request.form.getlist("name")
     types = request.form.getlist("typ")
@@ -80,12 +90,13 @@ def log_post():
 
     # Creates the name for the workout
     name = ""
-    for typ in types:
-        if typ not in name:
+    type_list = ["Abs","Back","Bicep","Chest","Legs","Tricep","Other"]
+    for typ in type_list:
+        if typ in types:
             if name == "":
-                name = name + typ
+                name = typ
             else:
-                name = name + "/" + typ
+                name = name + "/" + typ 
     name = name + " Workout"
 
     # Creates the timestamp relative to a timezone
@@ -121,6 +132,7 @@ def log_post():
     return redirect(url_for("main.profile"))
 
 @main.route("/deletelog/")
+@login_required
 def del_workout():
     workout_id = request.args.get("workout_id")
     
