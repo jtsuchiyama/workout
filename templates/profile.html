@@ -1,6 +1,18 @@
 {% extends "base.html" %}
 
 {% block content %}
+<head>
+  <script language="javascript">
+    function popup(workout_id) {
+      /* Creates the link for deleting the workout and prompts for confirmation to delete*/
+      link = "{{ url_for('main.del_workout') }}" + "?workout_id=" + workout_id; 
+      if (confirm("Are you sure that you want to delete this workout?")) 
+        location.href = link;
+        
+    }
+  </script>
+</head>
+
 <h1 class="title">
   Welcome, {{ name }}!
 </h1>
@@ -12,7 +24,7 @@
 <div class="box">
   <ul>
       {% for workout in workouts %}
-        <li><a href="{{ url_for('main.log_workout', workout_id = workout[0]) }}">{{ workout[2] }} {{ workout[3] }}</a><a href="{{ url_for('main.del_workout', workout_id = workout[0])}}"><img src="{{ url_for('static', filename='trashcan.jpg')}}" width="20" height="20"></a></li>
+        <li><a href="{{ url_for('main.log_workout', workout_id = workout[0]) }}">{{ workout[2] }} {{ workout[3] }}</a><img src="{{ url_for('static', filename='trashcan.jpg')}}" onclick="popup({{ workout.0 }})" width="20" height="20"></li>
       {% endfor %}
   </ul>
   {% with messages = get_flashed_messages() %}
