@@ -127,7 +127,17 @@ def log_post():
         sets = request.form.getlist("sets")
         workout_id = int(request.form.get("workout_id"))
 
-        if len(names) or len(types) or len(weights) or len (reps) or len(sets) == 0 or not (len(names) == len(types) == len(weights) == len (reps) == len(sets)):
+        form_list = [names,types,weights,reps,sets]
+        flag = 0
+        for form in form_list:
+            for entry in form:
+                # Iterates through every entry
+                if entry == '':
+                    # If there is a blank entry, indicate with flag and break
+                    flag = 1
+                    break
+
+        if flag == 1:
             # Prevents the workout from being logged if there are blanks
             flash("Make sure that all cells are filled out when logging workouts")
             return redirect(url_for("main.profile"))

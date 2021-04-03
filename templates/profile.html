@@ -15,8 +15,14 @@
         <li><a href="{{ url_for('main.log_workout', workout_id = workout[0]) }}">{{ workout[2] }} {{ workout[3] }}</a><a href="{{ url_for('main.del_workout', workout_id = workout[0])}}"><img src="{{ url_for('static', filename='trashcan.jpg')}}" width="20" height="20"></a></li>
       {% endfor %}
   </ul>
+  {% with messages = get_flashed_messages() %}
+  {% if messages %}
+      <div class="notification is-danger">
+          {{ messages[0] }}
+      </div>
+  {% endif %}
+  {% endwith %}
 </div>
-
 
 <h3>
   <a href="{{ url_for('main.log_workout', workout_id = 0) }}" class="title">Log workout</a>
