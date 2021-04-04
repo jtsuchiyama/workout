@@ -125,40 +125,40 @@
 		
 		<button class="button is-block is-info is-large is-fullwidth" name="load" value="Load">Import workout</button>
 
-		<INPUT type="hidden" name="workout_id" value="{{ workout_id }}">
+		<input type="hidden" name="workout_id" value="{{ workout_id }}">
 	</form>
 </div>
 
 <div class="box">
     <form method="POST" action="{{ url_for('main.log_post') }}">
-        <BODY>
-            <INPUT type="button" class="button is-block is-info is-large is-fullwidth" value="Add Set" onclick="addRow('dataTable')" />
+        <bpdy>
+            <input type="button" class="button is-block is-info is-large is-fullwidth" value="Add Set" onclick="addRow('dataTable')" />
         
-            <INPUT type="button" class="button is-block is-info is-large is-fullwidth" value="Delete Set" onclick="deleteRow('dataTable')" />
+            <input type="button" class="button is-block is-info is-large is-fullwidth" value="Delete Set" onclick="deleteRow('dataTable')" />
         
-            <TABLE id="dataTable" width="350px" border="1">
-                <TR>
-                    <TD><INPUT type="checkbox" name="chk"/></TD>
-                    <TD><INPUT type="text" name="name" placeholder="Exercise Name"/></TD>
-                    <TD>
-                        <SELECT name="typ" placeholder="Other">
-                            <OPTION value="Abs">Abs</OPTION>
-                            <OPTION value="Back">Back</OPTION>
-                            <OPTION value="Bicep">Bicep</OPTION>
-                            <OPTION value="Chest">Chest</OPTION>
-                            <OPTION value="Legs">Legs</OPTION>
-							<OPTION value="Shoulder">Shoulder</OPTION>
-                            <OPTION value="Tricep">Tricep</OPTION>
-							<OPTION value="Other">Other</OPTION>
+            <table id="dataTable" width="350px" border="1">
+                <tr>
+                    <td><input type="checkbox" name="chk"/></td>
+                    <td><input type="text" name="name" placeholder="Exercise Name"/></td>
+                    <td>
+                        <select name="typ" placeholder="Other">
+                            <option value="Abs">Abs</option>
+                            <option value="Back">Back</option>
+                            <option value="Bicep">Bicep</option>
+                            <option value="Chest">Chest</option>
+                            <option value="Legs">Legs</option>
+							<option value="Shoulder">Shoulder</option>
+                            <option value="Tricep">Tricep</option>
+							<option value="Other">Other</option>
                         </SELECT>
-                    </TD>
-                    <TD><INPUT type="number" name="weight" placeholder="Weight"/></TD>
-                    <TD><INPUT type="number" name="reps" placeholder="Reps"/></TD>
-					<TD><INPUT type="number" name="sets" placeholder="Sets"/></TD>
-                </TR>
+                    </td>
+                    <td><input type="number" name="weight" placeholder="Weight"/></td>
+                    <td><input type="number" name="reps" placeholder="Reps"/></td>
+					<td><input type="number" name="sets" placeholder="Sets"/></td>
+                </tr>
 
-				<INPUT type="hidden" name="workout_id"  value="{{ workout_id }}">
-            </TABLE>
+				<input type="hidden" name="workout_id"  value="{{ workout_id }}">
+            </table>
 
 			<script language="javascript">	
 				// Change sets to json format so that the Python list can be parsed
@@ -221,7 +221,7 @@
 				}
 			</script>
 
-        </BODY>
+        </body>
 
         <button class="button is-block is-info is-large is-fullwidth">Log workout</button>
     </form>
