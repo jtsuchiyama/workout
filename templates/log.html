@@ -147,6 +147,7 @@
                             <OPTION value="Bicep">Bicep</OPTION>
                             <OPTION value="Chest">Chest</OPTION>
                             <OPTION value="Legs">Legs</OPTION>
+							<OPTION value="Shoulder">Shoulder</OPTION>
                             <OPTION value="Tricep">Tricep</OPTION>
 							<OPTION value="Other">Other</OPTION>
                         </SELECT>
@@ -164,7 +165,7 @@
 				var sets = {{ sets|tojson }};
 				var table = document.getElementById('dataTable');
 
-				var options = ["Abs","Back","Bicep","Chest","Legs","Tricep","Other"];
+				var options = ["Abs","Back","Bicep","Chest","Legs","Shoulder","Tricep","Other"];
 				for(var i=0; i<sets.length; i++){
 					// Loads the cells with the information from the workout
 					addRow('dataTable');
@@ -174,7 +175,7 @@
 					for(var j=1; j<row.cells.length; j++) {
 						if (row.cells[j].childNodes[0].type == undefined) {
 							// If the node is a dropdown, then find and set the approriate exercise type
-							for(var k=0; k<7; k++) 
+							for(var k=0; k<8; k++) 
 								if (sets[i][j] == options[k])
 									row.cells[j].childNodes[1].selectedIndex = k;
 						}
@@ -226,6 +227,6 @@
     </form>
 </div>
 <h2>
-  <a href="{{ url_for('main.profile') }}" class="title">Back to profile</a>
+  <a href="{{ url_for('main.workouts') }}" class="title">Back to workouts</a>
 </h2>
 {% endblock %}

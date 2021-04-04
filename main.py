@@ -10,9 +10,9 @@ main = Blueprint("main", __name__)
 def index():
     return render_template("index.html")
 
-@main.route("/profile")
+@main.route("/workouts")
 @login_required
-def profile():
+def workouts():
     db = Database()
 
     query = "SELECT * FROM workout WHERE user_id = " + str(current_user.id)
@@ -34,9 +34,9 @@ def profile():
         workouts[index] = workout
         index += 1
         
-    return render_template("profile.html", workouts=workouts, name=current_user.name)
+    return render_template("workouts.html", workouts=workouts, name=current_user.name)
 
-@main.route("/newlog/", methods=["GET"])
+@main.route("/log/", methods=["GET"])
 @login_required
 def log_workout():
     workout_id = request.args.get("workout_id")
@@ -58,7 +58,7 @@ def log_workout():
         if int(user_id) != current_user.id:
             # If the current user does not own the workout, then redirect them
             flash("Do not attempt to access other user's workouts")
-            return redirect(url_for("main.profile"))
+            return redirect(url_for("main.workouts"))
 
     query = "SELECT * FROM workout WHERE user_id = " + str(current_user.id)
     workouts = db.select(query)
@@ -74,9 +74,9 @@ def log_workout():
 
     query = "SELECT * FROM set WHERE workout_id = " + str(workout_id)
     sets = db.select(query)
-    return render_template("newlog.html", name=name, sets=sets, workout_id=workout_id, workouts=workouts)
+    return render_template("log.html", name=name, sets=sets, workout_id=workout_id, workouts=workouts)
 
-@main.route("/newlog/", methods=["POST"])
+@main.route("/log/", methods=["POST"])
 @login_required
 def log_post():
     if "load" in request.form:
@@ -100,7 +100,7 @@ def log_post():
             if int(user_id) != current_user.id:
                 # If the current user does not own the workout, then redirect them
                 flash("Do not attempt to access other user's workouts")
-                return redirect(url_for("main.profile"))
+                return redirect(url_for("main.workouts"))
 
         query = "SELECT * FROM workout WHERE user_id = " + str(current_user.id)
         workouts = db.select(query)
@@ -116,7 +116,7 @@ def log_post():
 
         query = "SELECT * FROM set WHERE workout_id = " + str(import_id)
         sets = db.select(query)
-        return render_template("newlog.html", name=name, sets=sets, workout_id=workout_id, workouts=workouts)
+        return render_template("log.html", name=name, sets=sets, workout_id=workout_id, workouts=workouts)
 
     else:
         # If logging a new workout
@@ -140,11 +140,11 @@ def log_post():
         if flag == 1:
             # Prevents the workout from being logged if there are blanks
             flash("Make sure that all cells are filled out when logging workouts")
-            return redirect(url_for("main.profile"))
+            return redirect(url_for("main.workouts"))
 
         # Creates the name for the workout
         name = ""
-        type_list = ["Abs","Back","Bicep","Chest","Legs","Tricep","Other"]
+        type_list = ["Abs","Back","Bicep","Chest","Legs","Shoulder","Tricep","Other"]
         for typ in type_list:
             if typ in types:
                 if name == "":
@@ -183,7 +183,7 @@ def log_post():
                 (names[x], types[x], weights[x], reps[x], current_user.id, workout_id, sets[x])
             )
 
-        return redirect(url_for("main.profile"))
+        return redirect(url_for("main.workouts"))
 
 @main.route("/deletelog/")
 @login_required
@@ -197,4 +197,4 @@ def del_workout():
     query = "DELETE FROM set WHERE workout_id = " + str(workout_id)
     db.delete(query)
 
-    return redirect(url_for("main.profile"))
+    return redirect(url_for("main.workouts"))

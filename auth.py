@@ -26,7 +26,7 @@ def login_post():
 
     # If the above check passes, then we know the user has the right credentials, thus login
     login_user(user, remember=remember)
-    return redirect(url_for("main.profile"))
+    return redirect(url_for("main.workouts"))
 
 @auth.route("/signup")
 def signup():
