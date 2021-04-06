@@ -3,6 +3,10 @@ from flask_login import login_required, current_user
 from db import Database
 import datetime
 import pytz
+import pandas as pd
+import numpy as np #delete later if no need
+import matplotlib.pyplot as plt
+import mpld3
 
 main = Blueprint("main", __name__)
 
@@ -200,3 +204,42 @@ def del_workout():
     db.delete(query)
 
     return redirect(url_for("main.workouts"))
+
+@main.route("/history/")
+@login_required
+def history():
+    db = Database()
+
+    query = "SELECT name FROM set WHERE user_id = " + str(current_user.id)
+    names = db.select(query)
+
+    query = "SELECT weight, workout_id FROM set WHERE user_id = " + str(current_user.id)
+    exercises = db.select(query)
+
+    #plt.plot()
+    t = np.arange(0.0, 2.0, 0.01)
+    s = 1 + np.sin(2 * np.pi * t)
+
+    fig, ax = plt.subplots()
+    ax.plot(t, s)
+
+    ax.set(xlabel='time (s)', ylabel='voltage (mV)',
+        title='About as simple as it gets, folks')
+    ax.grid()
+    
+    html_str = mpld3.fig_to_html(fig)
+    html = open("templates/graph.html","w")
+    html.write(html_str)
+    html.close()
+    
+    #html = open("templates/graph.html","r")
+    #print(html.read())
+    #html.close()
+    
+    return render_template("history.html")
+
+@main.route("/graph/")
+@login_required
+def graph():
+    return render_template("graph.html")
+

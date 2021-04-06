@@ -24,6 +24,9 @@
                             <a href="{{ url_for('main.workouts') }}" class="navbar-item">
                                 Workouts
                             </a>
+                            <a href="{{ url_for('main.history') }}" class="navbar-item">
+                                History
+                            </a>
                             {% endif %}
                             {% if not current_user.is_authenticated %}
                             <a href="{{ url_for('auth.login') }}" class="navbar-item">
