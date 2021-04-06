@@ -125,9 +125,11 @@ def log_post():
         weights = request.form.getlist("weight")
         reps = request.form.getlist("reps")
         sets = request.form.getlist("sets")
+        notes = request.form.getlist("note")
         workout_id = int(request.form.get("workout_id"))
 
         form_list = [names,types,weights,reps,sets]
+        # Excluding notes since notes will not always be filled
         flag = 0
         for form in form_list:
             for entry in form:
@@ -178,9 +180,9 @@ def log_post():
         # Adds all of the sets to the database
         for x in range(len(names)):
             db.add(
-                """INSERT INTO set (name, typ, weight, reps, user_id, workout_id, sets) 
-                VALUES(%s, %s, %s, %s, %s, %s, %s)""", 
-                (names[x], types[x], weights[x], reps[x], current_user.id, workout_id, sets[x])
+                """INSERT INTO set (name, typ, weight, reps, user_id, workout_id, sets, note) 
+                VALUES(%s, %s, %s, %s, %s, %s, %s, %s)""", 
+                (names[x], types[x], weights[x], reps[x], current_user.id, workout_id, sets[x], notes[x])
             )
 
         return redirect(url_for("main.workouts"))

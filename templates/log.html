@@ -111,6 +111,7 @@
 			td:nth-of-type(4):before { content: "Weight"; }
 			td:nth-of-type(5):before { content: "Reps"; }
 			td:nth-of-type(6):before { content: "Sets"; }
+			td:nth-of-type(7):before { content: "Note"; }
 		}
 	</style>
 </HEAD>
@@ -155,6 +156,7 @@
                     <td><input type="number" name="weight" placeholder="Weight"/></td>
                     <td><input type="number" name="reps" placeholder="Reps"/></td>
 					<td><input type="number" name="sets" placeholder="Sets"/></td>
+					<td><input type="text" name="note" placeholder="Note"/></td>
                 </tr>
 
 				<input type="hidden" name="workout_id"  value="{{ workout_id }}">
@@ -181,11 +183,12 @@
 						}
 
 						else
-							if (row.cells[j].childNodes[0].name === "sets")
+							if (row.cells[j].childNodes[0].name == "sets")
 								// Sets the approriate value for the amount of sets
 								row.cells[j].childNodes[0].value = sets[i][7];
-							else
-								// Sets the approriate values for the cells besides the amount of sets
+
+							else if (row.cells[j].childNodes[0].name != "note")
+								// Import everything but notes
 								row.cells[j].childNodes[0].value = sets[i][j];
 					}			
 				}
@@ -194,7 +197,7 @@
 					table.deleteRow(i);
 				}
 			</script>
-			<script language="javascript">
+			<script language="javascript"> // Adding workouts to the "Import Workout" feature
 				// Change sets to json format so that the Python list can be parsed
 				var workouts = {{ workouts|tojson }};
 				var select = document.getElementById('import_id');
