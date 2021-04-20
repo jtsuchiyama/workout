@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block content %}
+{% block body %}
 <HEAD>
 	<SCRIPT language="javascript">
 		// addRow and deleteRow functions credit to ViralPatel
@@ -108,9 +108,9 @@
 			td:nth-of-type(1):before { content: "Delete?"; }
 			td:nth-of-type(2):before { content: "Exercise Name"; }
 			td:nth-of-type(3):before { content: "Type"; }
-			td:nth-of-type(4):before { content: "Weight"; }
-			td:nth-of-type(5):before { content: "Reps"; }
-			td:nth-of-type(6):before { content: "Sets"; }
+			td:nth-of-type(4):before { content: "Weight/Distance (miles)"; }
+			td:nth-of-type(5):before { content: "Reps/Time (hr:min:sec)"; }
+			td:nth-of-type(6):before { content: "Sets/Cadence"; }
 			td:nth-of-type(7):before { content: "Note"; }
 		}
 	</style>
@@ -142,19 +142,20 @@
                     <td><input type="checkbox" name="chk"/></td>
                     <td><input type="text" name="name" placeholder="Exercise Name"/></td>
                     <td>
-                        <select name="typ" placeholder="Other">
+                        <select name="typ" id="typ" onchange="placeholderUpdate()" placeholder="Other">
                             <option value="Abs">Abs</option>
                             <option value="Back">Back</option>
                             <option value="Bicep">Bicep</option>
                             <option value="Chest">Chest</option>
                             <option value="Legs">Legs</option>
+							<option value="Running">Running</option>
 							<option value="Shoulder">Shoulder</option>
                             <option value="Tricep">Tricep</option>
 							<option value="Other">Other</option>
                         </SELECT>
                     </td>
-                    <td><input type="number" name="weight" placeholder="Weight"/></td>
-                    <td><input type="number" name="reps" placeholder="Reps"/></td>
+                    <td><input type="number" name="weight" placeholder="Weight" step="0.01"/></td>
+                    <td><input type="text" name="reps" placeholder="Reps"/></td>
 					<td><input type="number" name="sets" placeholder="Sets"/></td>
 					<td><input type="text" name="note" placeholder="Note"/></td>
                 </tr>
@@ -162,12 +163,30 @@
 				<input type="hidden" name="workout_id"  value="{{ workout_id }}">
             </table>
 
+			<script language=javascript>
+				function placeholderUpdate() {
+					var rows = document.getElementsByTagName('tr');
+					for(var i=0;i<rows.length;i++) {
+						if (rows[i].cells[2].childNodes[1].value == "Running") {
+							rows[i].cells[3].childNodes[0].placeholder = "Distance (miles)";
+							rows[i].cells[4].childNodes[0].placeholder = "Time (hr:min:sec)";
+							rows[i].cells[5].childNodes[0].placeholder = "Cadence";
+						}
+						else {
+							rows[i].cells[3].childNodes[0].placeholder = "Weight";
+							rows[i].cells[4].childNodes[0].placeholder = "Reps";
+							rows[i].cells[5].childNodes[0].placeholder = "Sets";
+						}
+					}
+				}
+			</script>
+
 			<script language="javascript">	
 				// Change sets to json format so that the Python list can be parsed
 				var sets = {{ sets|tojson }};
 				var table = document.getElementById('dataTable');
 
-				var options = ["Abs","Back","Bicep","Chest","Legs","Shoulder","Tricep","Other"];
+				var options = ["Abs","Back","Bicep","Chest","Legs","Running","Shoulder","Tricep","Other"];
 				for(var i=0; i<sets.length; i++){
 					// Loads the cells with the information from the workout
 					addRow('dataTable');
@@ -177,7 +196,7 @@
 					for(var j=1; j<row.cells.length; j++) {
 						if (row.cells[j].childNodes[0].type == undefined) {
 							// If the node is a dropdown, then find and set the approriate exercise type
-							for(var k=0; k<8; k++) 
+							for(var k=0; k<options.length; k++) 
 								if (sets[i][j] == options[k])
 									row.cells[j].childNodes[1].selectedIndex = k;
 						}
@@ -196,25 +215,27 @@
 					// Gets rid of the extra row that gets created
 					table.deleteRow(i);
 				}
+				placeholderUpdate();
 			</script>
+
 			<script language="javascript"> // Adding workouts to the "Import Workout" feature
 				// Change sets to json format so that the Python list can be parsed
 				var workouts = {{ workouts|tojson }};
 				var select = document.getElementById('import_id');
 
 				for(var i=0;i<workouts.length;i++) {
-					var flag = 1;
+					var flag = 0;
 					for(var j=0;j<select.children.length;j++) {
 						if (workouts[j][2] == workouts[i][2]) {
 							if (i != j) {
 								// If the same workout name is already listed, then break and ignore that workout
-								flag = 0;
+								flag = 1;
 								break;
 							}
 						}	
 					}
 					
-					if (flag == 1) {
+					if (flag == 0) {
 						// Adds the workout to the select tag if there is no workout with the same name in the select tag
 						var option = document.createElement("option");
 						option.value = workouts[i][0];
@@ -223,7 +244,6 @@
 					}			
 				}
 			</script>
-
         </body>
 
         <button class="button is-block is-info is-large is-fullwidth">Log workout</button>

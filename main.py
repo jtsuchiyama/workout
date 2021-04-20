@@ -3,10 +3,10 @@ from flask_login import login_required, current_user
 from db import Database
 import datetime
 import pytz
-import pandas as pd
-import numpy as np #delete later if no need
-import matplotlib.pyplot as plt
+
 import mpld3
+
+
 
 main = Blueprint("main", __name__)
 
@@ -78,6 +78,12 @@ def log_workout():
 
     query = "SELECT * FROM set WHERE workout_id = " + str(workout_id)
     sets = db.select(query)
+
+    query = "SELECT * FROM run WHERE workout_id = " + str(workout_id)
+    runs = db.select(query)
+
+    sets = sets + runs
+
     return render_template("log.html", name=name, sets=sets, workout_id=workout_id, workouts=workouts)
 
 @main.route("/log/", methods=["POST"])
@@ -120,6 +126,12 @@ def log_post():
 
         query = "SELECT * FROM set WHERE workout_id = " + str(import_id)
         sets = db.select(query)
+
+        query = "SELECT * FROM run WHERE workout_id = " + str(import_id)
+        runs = db.select(query)
+
+        sets = sets + runs
+
         return render_template("log.html", name=name, sets=sets, workout_id=workout_id, workouts=workouts)
 
     else:
@@ -150,7 +162,7 @@ def log_post():
 
         # Creates the name for the workout
         name = ""
-        type_list = ["Abs","Back","Bicep","Chest","Legs","Shoulder","Tricep","Other"]
+        type_list = ["Abs","Back","Bicep","Chest","Legs","Running","Shoulder","Tricep","Other"]
         for typ in type_list:
             if typ in types:
                 if name == "":
@@ -178,16 +190,26 @@ def log_post():
             # If the workout is old, then delete the old sets from the workout and update the workout information
             query = "DELETE FROM set WHERE workout_id = " + str(workout_id)
             db.delete(query)
+            query = "DELETE FROM run WHERE workout_id = " + str(workout_id)
+            db.delete(query)
 
             db.update("UPDATE workout SET name = %s WHERE id = %s", (name, str(workout_id)))
 
         # Adds all of the sets to the database
         for x in range(len(names)):
-            db.add(
-                """INSERT INTO set (name, typ, weight, reps, user_id, workout_id, sets, note) 
-                VALUES(%s, %s, %s, %s, %s, %s, %s, %s)""", 
-                (names[x], types[x], weights[x], reps[x], current_user.id, workout_id, sets[x], notes[x])
-            )
+            if types[x] == "Running":
+                db.add(
+                    """INSERT INTO run (name, typ, distance, time, user_id, workout_id, cadence, note)  
+                    VALUES(%s, %s, %s, %s, %s, %s, %s, %s)""", 
+                    (names[x], "Running", weights[x], reps[x], current_user.id, workout_id, sets[x], notes[x])
+                )
+
+            else:
+                db.add(
+                    """INSERT INTO set (name, typ, weight, reps, user_id, workout_id, sets, note) 
+                    VALUES(%s, %s, %s, %s, %s, %s, %s, %s)""", 
+                    (names[x], types[x], weights[x], reps[x], current_user.id, workout_id, sets[x], notes[x])
+                )
 
         return redirect(url_for("main.workouts"))
 
@@ -202,44 +224,8 @@ def del_workout():
     db.delete(query)
     query = "DELETE FROM set WHERE workout_id = " + str(workout_id)
     db.delete(query)
+    query = "DELETE FROM run WHERE workout_id = " + str(workout_id)
+    db.delete(query)
 
     return redirect(url_for("main.workouts"))
-
-@main.route("/history/")
-@login_required
-def history():
-    db = Database()
-
-    query = "SELECT name FROM set WHERE user_id = " + str(current_user.id)
-    names = db.select(query)
-
-    query = "SELECT weight, workout_id FROM set WHERE user_id = " + str(current_user.id)
-    exercises = db.select(query)
-
-    #plt.plot()
-    t = np.arange(0.0, 2.0, 0.01)
-    s = 1 + np.sin(2 * np.pi * t)
-
-    fig, ax = plt.subplots()
-    ax.plot(t, s)
-
-    ax.set(xlabel='time (s)', ylabel='voltage (mV)',
-        title='About as simple as it gets, folks')
-    ax.grid()
-    
-    html_str = mpld3.fig_to_html(fig)
-    html = open("templates/graph.html","w")
-    html.write(html_str)
-    html.close()
-    
-    #html = open("templates/graph.html","r")
-    #print(html.read())
-    #html.close()
-    
-    return render_template("history.html")
-
-@main.route("/graph/")
-@login_required
-def graph():
-    return render_template("graph.html")
 

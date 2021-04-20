@@ -24,9 +24,6 @@
                             <a href="{{ url_for('main.workouts') }}" class="navbar-item">
                                 Workouts
                             </a>
-                            <a href="{{ url_for('main.history') }}" class="navbar-item">
-                                History
-                            </a>
                             {% endif %}
                             {% if not current_user.is_authenticated %}
                             <a href="{{ url_for('auth.login') }}" class="navbar-item">
@@ -49,7 +46,7 @@
 
         <div class="hero-body">
             <div class="container has-text-centered">
-               {% block content %}
+               {% block body %}
                {% endblock %}
             </div>
         </div>
